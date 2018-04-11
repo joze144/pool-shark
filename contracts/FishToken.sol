@@ -10,15 +10,30 @@ contract FishToken is iFishToken, Ownable, Timed {
 
     string public name;
     uint8 public decimals;                //How many decimals to show
-    Shark public currentShark;
+    address public currentShark;
     uint256 public totalSupply;
     mapping(address => uint256) public balances;
 
-    function FishToken(uint256 _deadline){
+    function FishToken(string _name, uint256 _deadline){
+        name = _name;
         deadline = _deadline;
         totalSupply = 0;
         currentShark = Shark(msg.sender, 0);
         owner = msg.sender;
+    }
+
+    function determineIfNewShark(address _address) internal returns (bool success) {
+        if(currentShark == _address) {
+            // Address already a current shark
+            return false;
+        }
+        if (balances[currentShark] >= balances[_address]) {
+            // Address balance lower or equal compared to the current shark one
+            return false;
+        }
+
+        currentShark = _address;
+        return true;
     }
 
     function transfer(address _to, uint256 _value) public onlyWhileOpen returns (bool success) {
@@ -30,13 +45,24 @@ contract FishToken is iFishToken, Ownable, Timed {
         balances[_to] = balances[_to].add(_value);
 
         LogTransfer(msg.sender, _to, _value);
+
+        if(determineIfNewShark(_to)) {
+            LogNewShark(_to, balances[_to]);
+        }
+
         return true;
     }
 
-    function issue(address _beneficiary, uint256 amount) public onlyOwner onlyWhileOpen returns (bool success) {
-        balances[_beneficiary] = balances[_beneficiary].add(amount);
-        totalSupply = totalSupply.add(amount);
-        LogIssue(_beneficiary, amount);
+    function issue(address _beneficiary, uint256 _amount) public onlyOwner onlyWhileOpen returns (bool success) {
+        balances[_beneficiary] = balances[_beneficiary].add(_amount);
+        totalSupply = totalSupply.add(_amount);
+
+        LogIssue(_beneficiary, _amount);
+
+        if(determineIfNewShark(_beneficiary)) {
+            LogNewShark(_beneficiary, balances[_beneficiary]);
+        }
+
         return true;
     }
 
@@ -52,7 +78,7 @@ contract FishToken is iFishToken, Ownable, Timed {
     }
 
     function getShark() public returns (Shark shark) {
-        return currentShark;
+        return Shark(currentShark, balances[currentShark]);
     }
 
     function getName() public view returns (string name) {

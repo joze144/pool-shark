@@ -19,7 +19,7 @@ contract iFishToken {
 
     function transfer(address _to, uint256 _amount) public returns (bool success);
 
-    function issue(address _beneficiary, uint256 amount) public returns (bool success);
+    function issue(address _beneficiary, uint256 _amount) public returns (bool success);
 
     function getShark() public returns (Shark shark);
 
@@ -30,4 +30,7 @@ contract iFishToken {
 
     /// @notice Event propagated when new deposit is made to the pool
     event LogIssue(address indexed _member, uint256 _value);
+
+    /// @notice Event propagated when new address has the most tokens
+    event LogNewShark(address indexed _shark, uint256 _value);
 }
