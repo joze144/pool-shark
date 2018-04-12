@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
 contract iPool {
-    function withdraw() external returns (bool success);
+    function () payable public;
 
-    function getToken() external view returns (address tokenAddress);
+    function withdraw() external returns (bool success);
 }
