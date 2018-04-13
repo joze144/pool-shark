@@ -15,7 +15,7 @@ contract Pool is iPool, Timed {
 
     function Pool(string _name, uint256 _rate, uint256 _deadline) public {
         require(_rate > 0);
-        require(_deadline > 0);
+        require(_deadline > block.timestamp);
         name = _name;
         rate = _rate;
         deadline = _deadline;
@@ -23,14 +23,14 @@ contract Pool is iPool, Timed {
     }
 
     //Deposit
-    function () payable onlyWhileOpen public {
+    function () public payable onlyWhileOpen {
         require(msg.value > 0);
         uint256 rewardTokens = rate.mul(msg.value);
-        iFishToken(token).issue(msg.sender, rewardTokens);
+        iFishToken(token).issueTokens(msg.sender, rewardTokens);
     }
 
     //Withdraw
-    function withdraw() external onlyWhileClosed returns (bool success) {
+    function withdraw() public onlyWhileClosed returns (bool success) {
         if(iFishToken(token).isShark(msg.sender)) {
            msg.sender.transfer(address(this).balance);
             return true;
