@@ -13,6 +13,9 @@ contract FishToken is iFishToken, Ownable, Timed {
     uint256 public totalSupply;
     mapping(address => uint256) public balances;
 
+    mapping(address => bool) public participantsMap;
+    address[] public participantsArray;
+
     function FishToken(uint256 _deadline) public {
         deadline = _deadline;
         totalSupply = 0;
@@ -20,46 +23,53 @@ contract FishToken is iFishToken, Ownable, Timed {
         owner = msg.sender;
     }
 
-    function determineIfNewShark(address _address) internal returns (bool success) {
-        if(currentShark == _address) {
-            // Address already a current shark
-            return false;
-        }
-        if (balances[currentShark] >= balances[_address]) {
-            // Address balance lower or equal compared to the current shark one
-            return false;
+    function determineNewShark() internal {
+        address shark = participantsArray[0];
+        uint arrayLength = participantsArray.length;
+        for (uint i=1; i < arrayLength; i++) {
+            if (balances[shark] < balances[participantsArray[i]]) {
+                shark = participantsArray[i];
+            }
         }
 
-        currentShark = _address;
+        if(currentShark != shark) {
+            currentShark = shark;
+            emit LogNewShark(shark, balances[shark]);
+        }
+    }
+
+    function addToParticipants(address _address) internal returns (bool success) {
+        if(participantsMap[_address]) {
+            return false;
+        }
+        participantsMap[_address] = true;
+        participantsArray.push(_address);
         return true;
     }
 
     function transfer(address _to, uint256 _value) public onlyWhileOpen returns (bool success) {
-        // Assumes totalSupply and initialAmount can't be over max (2^256 - 1)
         if (balances[msg.sender] < _value || balances[_to] + _value <= balances[_to]) {
             return false;
         }
+        addToParticipants(_to);
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
         emit LogTransfer(msg.sender, _to, _value);
 
-        if(determineIfNewShark(_to)) {
-            emit LogNewShark(_to, balances[_to]);
-        }
+        determineNewShark();
 
         return true;
     }
 
     function issueTokens(address _beneficiary, uint256 _amount) public onlyOwner onlyWhileOpen returns (bool success) {
+        addToParticipants(_beneficiary);
         balances[_beneficiary] = _amount.add(balances[_beneficiary]);
         totalSupply = _amount.add(totalSupply);
 
         emit LogIssue(_beneficiary, _amount);
 
-        if(determineIfNewShark(_beneficiary)) {
-            emit LogNewShark(_beneficiary, balances[_beneficiary]);
-        }
+        determineNewShark();
 
         return true;
     }

@@ -1,6 +1,4 @@
 const FishToken = artifacts.require("./FishToken.sol");
-const Web3 = require('web3')
-const web3 = new Web3()
 
 contract('FishToken', async (accounts) => {
   const owner = accounts[0]
@@ -42,12 +40,28 @@ contract('FishToken', async (accounts) => {
     await instance.issueTokens(owner, toIssue, {from: owner})
     assert.equal(await instance.currentShark(), owner)
 
-    const toTransfer = 600
-    await instance.transfer(user1, toTransfer, {from: owner})
+    const transfer1 = 600
+    await instance.transfer(user1, transfer1, {from: owner})
     assert.equal(await instance.currentShark(), user1)
-    const balanceOwner = await instance.balanceOf(owner, {from: owner})
-    const balanceUser1 = await instance.balanceOf(user1, {from: owner})
-    assert.equal(balanceOwner, (toIssue - toTransfer).toString())
-    assert.equal(balanceUser1, toTransfer.toString())
+    const t1balanceOwner = await instance.balanceOf(owner, {from: owner})
+    const t1balanceUser1 = await instance.balanceOf(user1, {from: owner})
+    assert.equal(t1balanceOwner, (toIssue - transfer1).toString())
+    assert.equal(t1balanceUser1, transfer1.toString())
+
+    const transfer2 = 200
+    await instance.transfer(owner, transfer2, {from: user1})
+    assert.equal(await instance.currentShark(), owner)
+    const t2balanceOwner = await instance.balanceOf(owner, {from: owner})
+    const t2balanceUser1 = await instance.balanceOf(user1, {from: owner})
+    assert.equal(t2balanceOwner, (t1balanceOwner + transfer2).toString())
+    assert.equal(t2balanceUser1, (t1balanceUser1 - transfer2).toString())
+
+    const transfer3 = 50
+    await instance.transfer(user1, transfer3, {from: owner})
+    assert.equal(await instance.currentShark(), owner)
+    const t3balanceOwner = await instance.balanceOf(owner, {from: owner})
+    const t3balanceUser1 = await instance.balanceOf(user1, {from: owner})
+    assert.equal(t3balanceOwner, (t2balanceOwner - transfer3).toString())
+    assert.equal(t3balanceUser1, (t2balanceUser1 + transfer3).toString())
   })
 })
