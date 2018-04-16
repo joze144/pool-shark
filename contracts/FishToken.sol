@@ -63,6 +63,9 @@ contract FishToken is iFishToken, Ownable, Timed {
     }
 
     function issueTokens(address _beneficiary, uint256 _amount) public onlyOwner onlyWhileOpen returns (bool success) {
+        if(balances[_beneficiary] + _amount <= balances[_beneficiary]) {
+            return false;
+        }
         addToParticipants(_beneficiary);
         balances[_beneficiary] = _amount.add(balances[_beneficiary]);
         totalSupply = _amount.add(totalSupply);
