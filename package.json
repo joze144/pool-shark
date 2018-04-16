@@ -1,0 +1,22 @@
+{
+  "name": "pool-shark",
+  "version": "1.0.0",
+  "description": "Shark of The Pool Smart Contracts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joze144/pool-shark.git"
+  },
+  "keywords": [
+    "Solidity",
+    "Ethereum"
+  ],
+  "author": "Jozhe <joze.kosmerl@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joze144/pool-shark/issues"
+  },
+  "homepage": "https://github.com/joze144/pool-shark#readme",
+  "dependencies": {
+    "web3": "^1.0.0-beta.33"
+  }
+}

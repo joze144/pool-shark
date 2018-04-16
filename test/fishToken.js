@@ -1,21 +1,23 @@
 const FishToken = artifacts.require("./FishToken.sol");
 
+const deadline = 1523874150 // has to be higher than current epoch seconds
+
 contract('FishToken', async (accounts) => {
   const owner = accounts[0]
   const user1 = accounts[1]
   const user2 = accounts[2]
 
   let instance
-  beforeEach('setup contract for each test', async function () {
-    instance = await FishToken.new(owner)
+  beforeEach('setup contract for each test', async () => {
+    instance = await FishToken.new(deadline)
   })
 
-  it('Owner has balance', async function() {
+  it('Owner has balance', async () => {
     const balance = await instance.balanceOf.call(owner, {from: owner})
     assert.equal(balance.toString(), '0')
   })
 
-  it('Has an owner', async function () {
+  it('Has an owner', async () => {
     assert.equal(await instance.owner(), owner)
   })
 
