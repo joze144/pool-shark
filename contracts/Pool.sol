@@ -26,7 +26,7 @@ contract Pool is iPool, Timed {
     function () public payable onlyWhileOpen {
         require(msg.value > 0);
         uint256 rewardTokens = rate.mul(msg.value);
-        iFishToken(token).issueTokens(msg.sender, rewardTokens);
+        require(iFishToken(token).issueTokens(msg.sender, rewardTokens));
     }
 
     //Withdraw
@@ -36,5 +36,9 @@ contract Pool is iPool, Timed {
             return true;
         }
         return false;
+    }
+
+    function getWeiCollected() external view returns (uint256 weiCollected) {
+        return address(this).balance;
     }
 }

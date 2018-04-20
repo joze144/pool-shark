@@ -17,6 +17,7 @@ contract FishToken is iFishToken, Ownable, Timed {
     address[] public participantsArray;
 
     function FishToken(uint256 _deadline) public {
+        require(_deadline > block.timestamp);
         deadline = _deadline;
         totalSupply = 0;
         currentShark = msg.sender;
