@@ -1,7 +1,7 @@
 const FishToken = artifacts.require("./FishToken.sol")
 
 const timePeriodInSeconds = 3600
-let from = Math.floor(new Date() / 1000)
+const from = Math.floor(new Date() / 1000)
 const to = from + timePeriodInSeconds
 
 contract('FishToken', async (accounts) => {

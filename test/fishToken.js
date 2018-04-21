@@ -5,7 +5,7 @@ const BigNumber = web3.BigNumber;
 const maxNumber = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
 
 const timePeriodInSeconds = 3600
-let from = Math.floor(new Date() / 1000)
+const from = Math.floor(new Date() / 1000)
 const to = from + timePeriodInSeconds
 
 contract('FishToken', async (accounts) => {
@@ -25,6 +25,20 @@ contract('FishToken', async (accounts) => {
       await assertSharkEqual(owner, instance)
       await assertDeadlineEqual(to, instance)
       await assertTotalSupplyEqual(0, instance)
+    })
+
+    it('Check if address is shark', async () => {
+      const toIssue = 100
+      const isSharkOwner = await instance.isShark(owner)
+      assert.equal(isSharkOwner, true)
+      const isSharkUser1 = await instance.isShark(user1)
+      assert.equal(isSharkUser1, false)
+      await assertIssueTokens(user1, toIssue, owner, instance)
+      const isSharkUser1AfterIssue = await instance.isShark(user1)
+      assert.equal(isSharkUser1AfterIssue, true)
+      const shark = await instance.getShark()
+      assert.equal(shark[0], user1)
+      assert.equal(shark[1].toString(), toIssue.toString())
     })
 
     it('Should issue tokens, owner call', async () => {

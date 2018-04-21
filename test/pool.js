@@ -9,7 +9,7 @@ const BigNumber = web3.BigNumber;
 const maxNumber = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
 
 const timePeriodInSeconds = 3600
-let from = Math.floor(new Date() / 1000)
+const from = Math.floor(new Date() / 1000)
 const to = from + timePeriodInSeconds
 
 const name = 'test'
