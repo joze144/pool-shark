@@ -32,7 +32,9 @@ contract Pool is iPool, Timed {
     //Withdraw
     function withdraw() public onlyWhileClosed returns (bool success) {
         if(iFishToken(token).isShark(msg.sender)) {
-           msg.sender.transfer(address(this).balance);
+            msg.sender.transfer(address(this).balance);
+
+            emit Withdraw(msg.sender, address(this));
             return true;
         }
         return false;
